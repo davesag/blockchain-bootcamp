@@ -2,6 +2,7 @@ const { expect } = require('chai')
 const BattleshipsV1 = artifacts.require('./BattleshipsV1.sol')
 
 const Zero = require('../utils/zero')
+const assertThrows = require('../utils/assertThrows')
 // const checkShipsNotPlaced = require('../utils/checkShipsNotPlaced')
 
 contract('BattleshipsV1 Start Game', ([player, opponent, nonplayer]) => {
@@ -35,5 +36,12 @@ contract('BattleshipsV1 Start Game', ([player, opponent, nonplayer]) => {
     expect(await battleships.isGameOver()).to.be.false
   })
 
-  // ;[1, 2, 3, 4, 5].forEach(checkShipsNotPlaced)
+  it('getGameState returns 1', async () => {
+    expect((await battleships.getGameState()).toNumber()).to.equal(1)
+  })
+
+  it('player cannot playTurn', () => assertThrows(battleships.playTurn(0, 0)))
+
+  it('opponent cannot playTurn', () =>
+    assertThrows(battleships.playTurn(0, 0, { from: opponent })))
 })

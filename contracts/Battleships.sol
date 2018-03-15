@@ -101,13 +101,6 @@ interface Battleships {
     function getCell(uint8 x, uint8 y) external view returns (uint8);
 
     /**
-     * Have all of the ships of the given type been placed?
-     * @param shipType The type of ship you are checking on, or if 0 it checks all ship types.
-     * @return true if all the ships of the given type have been placed.
-     */
-    function allShipsPlaced(uint8 shipType) external view returns (bool);
-
-    /**
      * The address of the player whose turn it is.
      * @return the current player's address.
      */
@@ -118,4 +111,16 @@ interface Battleships {
      * @return true if the one of the players has no remaining ships.
      */
     function isGameOver() external view returns (bool);
+
+    /**
+     * Check what the sender's game state is.
+     * Game States:
+     * 0: Not playing
+     * 1: Game created
+     * 2: Placing ships
+     * 3: Ships placed/playing game
+     * 4: Game over
+     * @return the number associated with the sneder's state
+     */
+    function getGameState() external view returns(uint8);
 }

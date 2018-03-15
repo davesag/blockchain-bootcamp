@@ -24,8 +24,18 @@ contract('BattleshipsV1 placeShip', ([player, opponent, nonplayer]) => {
     expect(getLog(tx, 'ShipPlaced')).to.be.ok
   })
 
-  xit("whoseTurn returns 'player'", () => {
-    expect(battleships.whoseTurn()).to.equal(player)
+  it('getGameState returns 2', async () => {
+    expect((await battleships.getGameState()).toNumber()).to.equal(2)
+  })
+
+  it('opponents getGameState returns 2', async () => {
+    expect(
+      (await battleships.getGameState({ from: opponent })).toNumber()
+    ).to.equal(2)
+  })
+
+  it("whoseTurn returns 'player'", async () => {
+    expect(await battleships.whoseTurn()).to.equal(player)
   })
 
   it('isGameOver returns false', async () => {
@@ -96,19 +106,19 @@ contract('BattleshipsV1 placeShip', ([player, opponent, nonplayer]) => {
 
       // These two tests can currently play, as we assert only that at
       // least one ship has been placed, not all of them.
-      xit("player can't play a turn", () =>
+      it("player can't play a turn", () =>
         assertThrows(battleships.playTurn(5, 5)))
 
-      xit("opponent can't play a turn", () =>
+      it("opponent can't play a turn", () =>
         assertThrows(battleships.playTurn(5, 5, { from: opponent })))
     })
   })
 
   describe('nonplayer', () => {
-    xit("can't place a ship", () =>
+    it("can't place a ship", () =>
       assertThrows(battleships.placeShip(1, 1, 1, 1, { from: nonplayer })))
 
-    xit("can't play a turn", () =>
+    it("can't play a turn", () =>
       assertThrows(battleships.playTurn(1, 1, { from: nonplayer })))
   })
 
