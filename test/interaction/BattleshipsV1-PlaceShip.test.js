@@ -24,11 +24,11 @@ contract('BattleshipsV1 placeShip', ([player, opponent, nonplayer]) => {
     expect(getLog(tx, 'ShipPlaced')).to.be.ok
   })
 
-  xit("whoseTurn returns 'player'", () => {
-    expect(battleships.whoseTurn()).to.equal(player)
+  it("whoseTurn returns 'player'", async () => {
+    expect(await battleships.whoseTurn()).to.equal(player)
   })
 
-  xit('isGameOver returns false', async () => {
+  it('isGameOver returns false', async () => {
     expect(await battleships.isGameOver()).to.be.false
   })
 
@@ -99,16 +99,16 @@ contract('BattleshipsV1 placeShip', ([player, opponent, nonplayer]) => {
       it("player can't play a turn", () =>
         assertThrows(battleships.playTurn(5, 5)))
 
-      xit("opponent can't play a turn", () =>
+      it("opponent can't play a turn", () =>
         assertThrows(battleships.playTurn(5, 5, { from: opponent })))
     })
   })
 
   describe('nonplayer', () => {
-    xit("can't place a ship", () =>
+    it("can't place a ship", () =>
       assertThrows(battleships.placeShip(1, 1, 1, 1, { from: nonplayer })))
 
-    xit("can't play a turn", () =>
+    it("can't play a turn", () =>
       assertThrows(battleships.playTurn(1, 1, { from: nonplayer })))
   })
 

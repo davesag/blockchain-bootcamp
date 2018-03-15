@@ -10,15 +10,8 @@ contract BattleshipsV1 is Battleships {
     mapping(address => bool) private currentPlayer;
     mapping(address => uint8[]) private shipsPlaced;
 
-    /*
-     * Game States:
-     * 0: Not playing
-     * 1: Game created
-     * 2: Placing ships
-     * 3: Ships placed/playing game
-     * 4: Game over
-     */
-    mapping(address => uint8) private gameState;
+    enum GameStates { NotPlaying, GameCreated, PlacingShips, PlayingGame, GameOver }
+    mapping(address => GameStates) private gameState;
 
     enum ShipTypes { Empty, Tug, Frigate, Destroyer, Battleship, Carrier }
     uint8[8][8] private defaultBoard;
@@ -32,12 +25,12 @@ contract BattleshipsV1 is Battleships {
     ShipInfo[] private defaultShips;
 
     modifier notAlreadyPlaying(address player) {
-        require(gameState[player] == 0);
+        require(gameState[player] == GameStates.NotPlaying);
         _;
     }
 
     modifier yourTurn() {
-        require(gameState[msg.sender] == 3);
+        require(gameState[msg.sender] == GameStates.PlayingGame);
         require(currentPlayer[msg.sender] == true);
         _;
     }
@@ -73,8 +66,8 @@ contract BattleshipsV1 is Battleships {
 
         currentPlayer[player] = true;
         currentPlayer[opponent] = false;
-        gameState[player] = 1;
-        gameState[opponent] = 1;
+        gameState[player] = GameStates.GameCreated;
+        gameState[opponent] = GameStates.GameCreated;
 
         GameStarted(player, opponent);
     }
@@ -137,11 +130,11 @@ contract BattleshipsV1 is Battleships {
         thisShipsPlaced[ship] = thisShipsPlaced[ship] + 1;
 
         if (allShipsPlaced() == true) {
-            gameState[player] = 3;
-            gameState[opponent] = 3;
+            gameState[player] = GameStates.PlayingGame;
+            gameState[opponent] = GameStates.PlayingGame;
         } else {
-            gameState[player] = 2;
-            gameState[opponent] = 2;
+            gameState[player] = GameStates.PlacingShips;
+            gameState[opponent] = GameStates.PlacingShips;
         }
 
         ShipPlaced(player, x, y, ship, direction);
@@ -163,8 +156,6 @@ contract BattleshipsV1 is Battleships {
     {
         address player = msg.sender;
         address opponent = opponents[player];
-        assert(gameState[player] == 3);
-        assert(gameState[opponent] == 3);
         uint8 result = 0; // TODO: Calculate this
         uint8 hitsPercentage = 0; // TODO: Calculate this
         uint8 shipId = 10; // TODO: Get it from somewhere?
@@ -217,7 +208,7 @@ contract BattleshipsV1 is Battleships {
         view
         returns (address)
     {
-        if (currentPlayer[msg.sender]) {
+        if (currentPlayer[msg.sender] == true) {
             return msg.sender;
         } else {
             return opponents[msg.sender];
@@ -233,13 +224,7 @@ contract BattleshipsV1 is Battleships {
         view
         returns (bool)
     {
-        if (checkGameOver(msg.sender)) {
-            return true;
-        }
-        if (checkGameOver(opponents[msg.sender])) {
-            return true;
-        }
-        return false;
+        return gameState[msg.sender] == GameStates.GameOver;
     }
 
     /**
@@ -251,22 +236,7 @@ contract BattleshipsV1 is Battleships {
         view
         returns(uint8)
     {
-        return gameState[msg.sender];
-    }
-
-    /**
-     * Checks if a player has lost the game
-     * @return true if the player has lost
-     */
-    function checkGameOver(address player)
-        internal
-        view
-        returns(bool)
-    {
-        if (gameState[player] == 2 && isBoardCleared(player)) {
-            GameEnded(player, opponents[player], opponents[player]);
-            return true;
-        }
+        return uint8(gameState[msg.sender]);
     }
 
     /**
