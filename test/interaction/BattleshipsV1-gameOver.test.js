@@ -16,22 +16,85 @@ contract('BattleshipsV1 game over', ([player, opponent]) => {
 
   before(async () => {
     battleships = await BattleshipsV1.new()
-    await battleships.startGame(opponent)
-    // tx = await battleships.placeShip(x, y, ship, direction)
-    // tx = await battleships.placeShip(x, y, ship, direction)
-    // tx = await battleships.placeShip(x, y, ship, direction)
-    // ..
+    tx = await battleships.startGame(opponent)
 
-    // tx = await battleships.placeShip(x, y, ship, direction, { from: opponent })
-    // tx = await battleships.placeShip(x, y, ship, direction, { from: opponent })
-    // tx = await battleships.placeShip(x, y, ship, direction, { from: opponent })
-    // ..
+    // Placing all the ships
+    /*
+    Player 1
+    T____FDB
+    FF___FDB
+    DDD___DB
+    BBBB___B
+    CCCCC___
+    CCCCC___
+    ________
+    ________
 
-    // tx = await battleships.playTurn(x, y)
-    // tx = await battleships.playTurn(x, y, { from: opponent })
-    // tx = await battleships.playTurn(x, y)
-    // tx = await battleships.playTurn(x, y, { from: opponent })
-    // ..
+    Player 2
+    _____BDF
+    _____BDF
+    T____BD_
+    FF___B__
+    DDD_____
+    BBBB____
+    CCCCC___
+    CCCCC___
+    */
+    tx = await battleships.placeShip(0, 0, 1, 1)
+    tx = await battleships.placeShip(0, 1, 2, 1)
+    tx = await battleships.placeShip(0, 2, 3, 1)
+    tx = await battleships.placeShip(0, 3, 4, 1)
+    tx = await battleships.placeShip(0, 4, 5, 1)
+    tx = await battleships.placeShip(5, 0, 2, 0)
+    tx = await battleships.placeShip(6, 0, 3, 0)
+    tx = await battleships.placeShip(7, 0, 4, 0)
+
+    tx = await battleships.placeShip(0, 2, 1, 1, { from: opponent })
+    tx = await battleships.placeShip(0, 3, 2, 1, { from: opponent })
+    tx = await battleships.placeShip(0, 4, 3, 1, { from: opponent })
+    tx = await battleships.placeShip(0, 5, 4, 1, { from: opponent })
+    tx = await battleships.placeShip(0, 6, 5, 1, { from: opponent })
+    tx = await battleships.placeShip(5, 0, 4, 0, { from: opponent })
+    tx = await battleships.placeShip(6, 0, 3, 0, { from: opponent })
+    tx = await battleships.placeShip(7, 0, 2, 0, { from: opponent })
+
+    tx = await battleships.playTurn(0, 2)
+    tx = await battleships.playTurn(0, 0, { from: opponent })
+    tx = await battleships.playTurn(0, 3)
+    tx = await battleships.playTurn(0, 0, { from: opponent })
+    tx = await battleships.playTurn(0, 4)
+    tx = await battleships.playTurn(0, 0, { from: opponent })
+    tx = await battleships.playTurn(1, 4)
+    tx = await battleships.playTurn(0, 0, { from: opponent })
+    tx = await battleships.playTurn(0, 5)
+    tx = await battleships.playTurn(0, 0, { from: opponent })
+    tx = await battleships.playTurn(1, 5)
+    tx = await battleships.playTurn(0, 0, { from: opponent })
+    tx = await battleships.playTurn(0, 6)
+    tx = await battleships.playTurn(0, 0, { from: opponent })
+    tx = await battleships.playTurn(1, 6)
+    tx = await battleships.playTurn(0, 0, { from: opponent })
+    tx = await battleships.playTurn(2, 6)
+    tx = await battleships.playTurn(0, 0, { from: opponent })
+    tx = await battleships.playTurn(3, 6)
+    tx = await battleships.playTurn(0, 0, { from: opponent })
+    tx = await battleships.playTurn(4, 6)
+    tx = await battleships.playTurn(0, 0, { from: opponent })
+
+    tx = await battleships.playTurn(5, 0)
+    tx = await battleships.playTurn(0, 0, { from: opponent })
+    tx = await battleships.playTurn(5, 1)
+    tx = await battleships.playTurn(0, 0, { from: opponent })
+    tx = await battleships.playTurn(6, 0)
+    tx = await battleships.playTurn(0, 0, { from: opponent })
+    tx = await battleships.playTurn(6, 1)
+    tx = await battleships.playTurn(0, 0, { from: opponent })
+    tx = await battleships.playTurn(7, 0)
+    tx = await battleships.playTurn(0, 0, { from: opponent })
+  })
+
+  xit('getGameState returns 4', async () => {
+    expect((await battleships.getGameState()).toNumber()).to.equal(4)
   })
 
   xit('emitted the GameOver event', () => {
