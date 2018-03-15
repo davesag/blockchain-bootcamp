@@ -29,7 +29,9 @@ contract('BattleshipsV1 placeShip', ([player, opponent, nonplayer]) => {
   })
 
   it('opponents getGameState returns 2', async () => {
-    expect((await battleships.getGameState({ from: opponent })).toNumber()).to.equal(2)
+    expect(
+      (await battleships.getGameState({ from: opponent })).toNumber()
+    ).to.equal(2)
   })
 
   it("whoseTurn returns 'player'", async () => {

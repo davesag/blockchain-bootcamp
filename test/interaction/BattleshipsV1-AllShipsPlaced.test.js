@@ -69,8 +69,7 @@ contract('BattleshipsV1 all ships placed', ([player, opponent]) => {
     it("opponent can't place another ship", () =>
       assertThrows(
         battleships.placeShip(x, y, ship, direction, { from: opponent })
-      )
-    )
+      ))
   })
 
   it('getGameState returns 3', async () => {
