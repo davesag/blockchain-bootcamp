@@ -6,7 +6,7 @@ const { getLog } = require('../utils/txHelpers')
 const assertThrows = require('../utils/assertThrows')
 // const checkShipsNotPlaced = require('../utils/checkShipsNotPlaced')
 
-contract('BattleshipsV1 game over', ([player, opponent]) => {
+contract('BattleshipsV1 game over', ([player, opponent, new1, new2]) => {
   let battleships
   let tx
   const x = 3
@@ -97,8 +97,8 @@ contract('BattleshipsV1 game over', ([player, opponent]) => {
     expect((await battleships.getGameState()).toNumber()).to.equal(4)
   })
 
-  xit('emitted the GameOver event', () => {
-    expect(getLog(tx, 'GameOver')).to.exist
+  xit('emitted the GameEnded event', () => {
+    expect(getLog(tx, 'GameEnded')).to.exist
   })
 
   xit('isGameOver is true for player', async () => {
@@ -109,17 +109,25 @@ contract('BattleshipsV1 game over', ([player, opponent]) => {
     expect(await battleships.isGameOver({ from: opponent })).to.be.true
   })
 
-  xit('whoseTurn returns 0x0', async () => {
-    expect(await battleships.whoseTurn()).to.equal(Zero.address)
+  xit("player can't play a turn", () =>
+    assertThrows(battleships.playTurn(0, 0)))
+
+  xit("opponent can't play a turn", () =>
+    assertThrows(battleships.playTurn(0, 0, { from: opponent })))
+
+  xit('opponents board is clear', async () => {
+    expect(await battleships.isBoardCleared(opponent)).to.be.true
   })
 
-  xit('player has no opponent', async () => {
-    expect(await battleships.getOpponent()).to.equal(Zero.address)
-  })
+  xcontext('players can start new games', () => {
+    it('player can start a new game', async () => {
+      tx = await battleships.startGame(new1)
+      expect(getLog(tx, 'GameStarted')).to.be.ok
+    })
 
-  xit('opponent has no opponent', async () => {
-    expect(await battleships.getOpponent({ from: opponent })).to.equal(
-      Zero.address
-    )
+    it('player can start a new game', async () => {
+      tx = await battleships.startGame(new2, { from: opponent })
+      expect(getLog(tx, 'GameStarted')).to.be.ok
+    })
   })
 })
