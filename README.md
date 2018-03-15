@@ -52,6 +52,18 @@ We provide the following linting options
 * `npm run lint:sol` — to lint the Solidity files, and
 * `npm run lint:js` — to lint the Javascript.
 
+### Deployment to Ropsten
+
+Create a `.env` file with
+
+    PRIVATE_KEY=<the private key of your eth address>
+
+This *must not* be committed to the the project.
+
+then run
+
+    npm run deploy:ropsten
+
 ## Contributing
 
 Please see the [contributing notes](CONTRIBUTING.md).
