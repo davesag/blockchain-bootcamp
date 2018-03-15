@@ -34,5 +34,7 @@ contract('BattleshipsV1 Creation', ([player, opponent]) => {
     expect(await battleships.isGameOver()).to.be.false
   })
 
-  // ;[1, 2, 3, 4, 5].forEach(checkShipsNotPlaced)
+  it('getGameState returns 0', async () => {
+    expect((await battleships.getGameState()).toNumber()).to.equal(0)
+  })
 })

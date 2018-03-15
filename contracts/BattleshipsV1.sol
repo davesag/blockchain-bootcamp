@@ -9,6 +9,15 @@ contract BattleshipsV1 is Battleships {
     mapping(address => uint8[][]) private boards;
     mapping(address => bool) private currentPlayer;
     mapping(address => uint8[]) private shipsPlaced;
+
+    /*
+     * Game States:
+     * 0: Not playing
+     * 1: Game created
+     * 2: Placing ships
+     * 3: Ships placed/playing game
+     * 4: Game over
+     */
     mapping(address => uint8) private gameState;
 
     enum ShipTypes { Empty, Tug, Frigate, Destroyer, Battleship, Carrier }
@@ -23,11 +32,12 @@ contract BattleshipsV1 is Battleships {
     ShipInfo[] private defaultShips;
 
     modifier notAlreadyPlaying(address player) {
-        require(opponents[player] == address(0));
+        require(gameState[player] == 0);
         _;
     }
 
     modifier yourTurn() {
+        require(gameState[msg.sender] == 3);
         require(currentPlayer[msg.sender] == true);
         _;
     }
@@ -62,12 +72,11 @@ contract BattleshipsV1 is Battleships {
         clearBoard(opponent);
 
         currentPlayer[player] = true;
-        currentPlayer[opponent] = true;
+        currentPlayer[opponent] = false;
         gameState[player] = 1;
         gameState[opponent] = 1;
 
         GameStarted(player, opponent);
-
     }
 
     /**
@@ -97,6 +106,7 @@ contract BattleshipsV1 is Battleships {
         external
     {
         address player = msg.sender;
+        address opponent = opponents[player];
 
         ShipInfo memory thisShip = defaultShips[ship];
         uint8[] storage thisShipsPlaced = shipsPlaced[player];
@@ -122,10 +132,17 @@ contract BattleshipsV1 is Battleships {
 
         }
 
-        // Reduce the numbers of that ship
+        // Place another ship in the total list, and the specific list
+        thisShipsPlaced[0] = thisShipsPlaced[0] + 1;
         thisShipsPlaced[ship] = thisShipsPlaced[ship] + 1;
 
-        gameState[player] = 2;
+        if (allShipsPlaced() == true) {
+            gameState[player] = 3;
+            gameState[opponent] = 3;
+        } else {
+            gameState[player] = 2;
+            gameState[opponent] = 2;
+        }
 
         ShipPlaced(player, x, y, ship, direction);
     }
@@ -146,8 +163,8 @@ contract BattleshipsV1 is Battleships {
     {
         address player = msg.sender;
         address opponent = opponents[player];
-        assert(gameState[player] == 2);
-        assert(gameState[opponent] == 2);
+        assert(gameState[player] == 3);
+        assert(gameState[opponent] == 3);
         uint8 result = 0; // TODO: Calculate this
         uint8 hitsPercentage = 0; // TODO: Calculate this
         uint8 shipId = 10; // TODO: Get it from somewhere?
@@ -192,40 +209,6 @@ contract BattleshipsV1 is Battleships {
     }
 
     /**
-     * Have all of the ships of the given type been placed?
-     * @param shipType The type of ship you are checking on, or if 0 it checks all ship types.
-     * @return true if all the ships of the given type have been placed.
-     *
-     *   | Type       | size  | count | sum
-     * 1 | Tug        | 1 x 1 | 1     | 1
-     * 2 | Frigate    | 1 x 2 | 2     | 4
-     * 3 | Destroyer  | 1 x 3 | 2     | 6
-     * 4 | Battleship | 1 x 4 | 2     | 8
-     * 5 | Carrier    | 2 x 5 | 1     | 10
-     *     Total                        29
-     */
-    function allShipsPlaced(uint8 shipType)
-        external
-        view
-        returns (bool)
-    {
-        /* All cells will have to checked anyone, so front load that work. */
-        uint8[6] memory expectedCounts = [29, 1, 4, 6, 8, 10];
-        uint8[6] memory cellCounts;
-        for (uint8 x = 0; x < 8; ++x) {
-            for (uint8 y = 0; y < 8; ++y) {
-                uint8 cellType = boards[msg.sender][x][y];
-                if (cellType != 0) {
-                    cellCounts[cellType] += 1;
-                    cellCounts[0] += 1;
-                }
-            }
-        }
-
-        return cellCounts[shipType] == expectedCounts[shipType];
-    }
-
-    /**
      * The address of the player whose turn it is.
      * @return the current player's address.
      */
@@ -257,6 +240,18 @@ contract BattleshipsV1 is Battleships {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Check what the sender's game state is.
+     * @return the number associated with the sneder's state
+     */
+    function getGameState()
+        external
+        view
+        returns(uint8)
+    {
+        return gameState[msg.sender];
     }
 
     /**
@@ -307,5 +302,24 @@ contract BattleshipsV1 is Battleships {
         }
         // Reset the shipPlaced to zero
         shipsPlaced[player] = new uint8[](6);
+    }
+
+    /**
+     * Check if all ships in a game have been placed
+     */
+    function allShipsPlaced()
+        internal
+        view
+        returns(bool)
+    {
+        uint8 totalShipsCount = 8;
+
+        address player = msg.sender;
+        address opponent = opponents[player];
+
+        bool playerFinished = shipsPlaced[player][0] == totalShipsCount;
+        bool opponentFinished = shipsPlaced[opponent][0] == totalShipsCount;
+
+        return playerFinished && opponentFinished;
     }
 }

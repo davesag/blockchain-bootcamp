@@ -96,7 +96,7 @@ contract('BattleshipsV1 placeShip', ([player, opponent, nonplayer]) => {
 
       // These two tests can currently play, as we assert only that at
       // least one ship has been placed, not all of them.
-      xit("player can't play a turn", () =>
+      it("player can't play a turn", () =>
         assertThrows(battleships.playTurn(5, 5)))
 
       xit("opponent can't play a turn", () =>
