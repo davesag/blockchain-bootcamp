@@ -1,3 +1,12 @@
+require('dotenv').config()
+
+const Provider = require('truffle-privatekey-provider')
+
+const privateKey = process.env.PRIVATE_KEY
+
+const engineRopsten = () =>
+  new Provider(privateKey, 'https://ropsten.infura.io/yjqnTtPRQ0VNfO2jx81m')
+
 const {
   name: packageName,
   version,
@@ -23,14 +32,13 @@ module.exports = {
   license,
   authors: [author, ...contributors],
   networks: {
-    geth: { ...DEFAULT, gas: 999999 }
-    // ropsten: {
-    //   network_id: 3,
-    //   provider: engineRopsten,
-    //   from: addresses[0],
-    //   gas: 4700000,
-    //   gasPrice: 222000000000
-    // },
+    geth: { ...DEFAULT, gas: 999999 },
+    ropsten: {
+      network_id: 3,
+      provider: engineRopsten,
+      gas: 4700000,
+      gasPrice: 222000000000
+    }
     // mainnet: {
     //   network_id: 1,
     //   provider: engineMainnet,
