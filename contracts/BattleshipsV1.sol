@@ -25,7 +25,7 @@ contract BattleshipsV1 is Battleships {
     ShipInfo[] private defaultShips;
 
     modifier notAlreadyPlaying(address player) {
-        require(gameState[player] == GameStates.NotPlaying);
+        require(gameState[player] == GameStates.NotPlaying || gameState[player] == GameStates.GameOver);
         _;
     }
 
