@@ -69,27 +69,11 @@ contract('BattleshipsV1 all ships placed', ([player, opponent]) => {
     it("opponent can't place another ship", () =>
       assertThrows(
         battleships.placeShip(x, y, ship, direction, { from: opponent })
-      ))
+      )
+    )
   })
 
-  // ;[1, 2, 3, 4, 5].forEach(checkShipsAllPlaced)
-
-  xcontext('opponent tries to play a shot out of turn', () => {
-    it('throws an error', () =>
-      assertThrows(battleships.playTurn(1, 1, { from: opponent })))
-  })
-
-  xcontext('player plays a turn', () => {
-    before(async () => {
-      tx = await battleships.playTurn(1, 1)
-    })
-
-    it('emitted the TurnPlayed event', () => {
-      expect(getLog(tx, 'TurnPlayed')).to.exist
-    })
-
-    it("now it is the opponent's turn", async () => {
-      expect(await battleships.whoseTurn()).to.equal(opponent)
-    })
+  it('getGameState returns 3', async () => {
+    expect((await battleships.getGameState()).toNumber()).to.equal(3)
   })
 })
